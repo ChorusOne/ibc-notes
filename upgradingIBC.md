@@ -39,4 +39,18 @@ Given each chain upgrade costs $150k, a natural desire exists to reduce the tota
 A final consideration is that IBC and Tendermint consensus upgrades should remain open to radical design changes. At the consensus layer, the crypto space is exceptionally competitive - Avalanche, Solana, GRANDPA, and other consensus mechanisms go live in 2020. At the interchain communication layer, competition from ChainBridge and XCMP will heat up. While the Cosmos community has done a splendid job at skating to where the puck is (and will be), we need to keep nimble and prevent these codebases from getting stymied.
 
 ### 3: Challenges outlined in the core co-ordination call
+Two key challenges have been hitherto highlighted: The difficulty of ecosystem level upgrades to Tendermint that break light clients and packet-timeout problems with chain upgrades with subjectively decided dump-state restarts. The next sub-sections cover these issues. 
+
+#### 3.1: Light client breaking Tendermint upgrades
+Let's return to the two Cosmos-SDK plus Tendermint chains that run light clients for each other, and send packets over an IBC connection - red chain and blue chain. Figure 2 is a simplified version of Figure 1. The darker squares represent light clients of the chains running on the counter-party. The latest, and greatest, (light-client) breaking release of Tendermint ships. Red and Blue communities are excited to have the unique feature - BLS signatures, zkProofs, whatever. How does the upgrade cycle work as per the current Go-IBC implementation?
+
+![](diagrams/Upgrades_figure_two.png)
+
+It's complicated - there are four steps for execution in sequence:
+* Blue chain upgrades and the new release only contains the new light client for Red. Blue can't update its consensus yet since it's light client on Red isn't updated yet.
+* The Red chain upgrades its Tendermint consensus algorithm since it now has an updated light client on Blue.
+* The Red chain then updates the blue light client running on Red.
+* Blue chain upgrades its Tendermint consensus algorithm.
+
+Steps 2 and 3 are composable into a single upgrade. The two communities in total need 3 separate full governance votes. That's $400k+ for a single Tendermint upgrade in COGS across the two communities. Another issue is that the governance burden is asymmetric - blue needs to execute governance votes (and dump state restart) twice, while red runs it only once. The utility from the process is identical, while the responsibility and COGS are asymmetric. A game of chicken is likely - both communities will want the other one to do more work due to the value at stake.
 
