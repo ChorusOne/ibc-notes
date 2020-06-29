@@ -10,7 +10,7 @@ This section lists several essential ideas, which will combine in later chapters
 #### 2.1: The key need of end users
 Let's consider this situation described in Figure 1.
 
-[[Upgrades_figure_one.png]]
+[[../Upgrades_figure_one.png]]
 
 Conceive Robinson, who transferred funds from blue chain to red chain using a particular channel on top of a connection/client. Robinson relies on the channel retaining its identity and properties throughout any upgrades to red and blue chains. There are different violations, detailed in this document, that could lead to Robinson’s funds being stuck/frozen on red if upgrades don’t take place correctly.
 
