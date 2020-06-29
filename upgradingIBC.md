@@ -1,6 +1,3 @@
-### Table of Contents
-
-
 ### 1: Introduction 
 This file documents the issues around IBC upgrades at an ecosystem level with multiple chains connected. The concerns were raised in the IBC core co-ordination call.
 
