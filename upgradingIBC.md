@@ -73,3 +73,17 @@ In the four-zone case, the total cost could exceed $1 million. For one Hub and n
 Provided this reasoning is correct; it behooves the community to make Tendermint headers as elastic as we can before IBC goes live. Once live, we can potentially put in place long terms solutions as covered in Section 4.
 
 #### 3.2 Block number continuity breaking upgrades
+A different kind of problem arises when one considers the block-based packet-timeout mechanism in IBC. This mechanism essentially allows the Red chain to send a packet to the Blue Chain, with a block number based timeout. If the Blue chain does not process the particular packet by the specific block number, the sender of the packet can submit proof of noninclusion to Red and have Red handle the error gracefully. 
+
+An illustrative example for this feature is the case of a user locking up Bitcoin-representing tokens on the Red chain, and requesting blue to mint Bitcoin vouchers there. If Blue does not mint the coupons by the indicated block, the user can use the timeout mechanism to request Red to release their locked tokens. As you can see, this feature is useful for the most basic applications - cross-chain token transfer.
+
+Here lies the issue: A chain upgrade on Blue could jam this mechanism by breaking the block numbers' continuity assumption. The packet-timeout device assumes that block numbers will keep going up and that the blue chain will not suffer a liveness attack. Dump start upgrades - the most common variety of updates in the Cosmos ecosystem - have blocked numbers reset to zero, and the chain-id of the upgrading chain alter. 
+
+For example, Blue's chain-id could be blue-1, and it's current block number 5000. Red emits a packet with timeout block 7000 on blue-1. However, Blue upgrades to blue-2 and sets the block number at zero. In this case, there never will be a block with block number 7000 on blue-1. Therefore, the user that triggered the packet's emission will never be able to access the packet timeout mechanism on Red. If the packet contains a token transfer as conceived earlier, their tokens will be stuck in no man's land between the chains - frozen!
+
+The underlying problem is a leakage of chain-ids and block numbers onto higher layers of the IBC stack. A solution here requires blue to indicate some intention to upgrade on the Red chain, before the upgrade. 
+
+A slightly different problem similar in flavor is chains that adopt a different mechanism for tracking "block numbers." For instance, HotStuff appears to have gone for scheduled dump-state restarts in the regular operation of its consensus algorithm. Block numbers regularly set to zero. The IBC stack, as a result, needs to be general enough to allow for a wide variety of block number and chain - id upgrade mechanisms to exists in participating chains. It's this problem that's (as yet unsolved) in the current specification and Golang implementation.
+
+### 4. Potential Solution
+Would WASM compilable versions of the [Informal Rust IBC implementation](https://github.com/informalsystems/ibc-rs) and [Informal Rust Tendermint Light Client](https://github.com/informalsystems/tendermint-rs/tree/master/light-client) make headway in addressing these issues? (To be explored in IBC Core Co-ordination calls)
