@@ -47,10 +47,32 @@ Let's return to the two Cosmos-SDK plus Tendermint chains that run light clients
 ![](diagrams/Upgrades_figure_two.png)
 
 It's complicated - there are four steps for execution in sequence:
-* Blue chain upgrades and the new release only contains the new light client for Red. Blue can't update its consensus yet since it's light client on Red isn't updated yet.
-* The Red chain upgrades its Tendermint consensus algorithm since it now has an updated light client on Blue.
-* The Red chain then updates the blue light client running on Red.
-* Blue chain upgrades its Tendermint consensus algorithm.
+1. Blue chain upgrades and the new release only contains the new light client for Red. Blue can't update its consensus yet since it's light client on Red isn't updated yet.
+2. The Red chain upgrades its Tendermint consensus algorithm since it now has an updated light client on Blue.
+3. The Red chain then updates the blue light client running on Red.
+4. Blue chain upgrades its Tendermint consensus algorithm.
 
-Steps 2 and 3 are composable into a single upgrade. The two communities in total need 3 separate full governance votes. That's $400k+ for a single Tendermint upgrade in COGS across the two communities. Another issue is that the governance burden is asymmetric - blue needs to execute governance votes (and dump state restart) twice, while red runs it only once. The utility from the process is identical, while the responsibility and COGS are asymmetric. A game of chicken is likely - both communities will want the other one to do more work due to the value at stake.
+Steps 2 and 3 are composable into a single upgrade. The two communities in total need three separate full governance votes. That's $400k+ for a single Tendermint update in COGS across the two communities. Another issue is that the governance burden is asymmetric - blue needs to execute governance votes (and dump state restart) twice, while red runs it only once. The utility from the process is identical, while the responsibility and COGS are asymmetric. A game of chicken is likely - both communities will want the other to do more work due to the value at stake.
 
+The complicated case is plot in Figure 3 - a network of four zones and a Hub. While the diagram considers four zones, the general case is n zones. 
+
+![](diagrams/Upgrades_figure_three.png)
+
+How does the ecosystem upgrade? Like this:
+1. Blue, Green, Purple, and Red upgrade the light client for Gray Hub, on their chains, via governance and dump state restart. That's four separate governance upgrades costing $600k to different communities. 
+2. Gray Hub upgrades its consensus engine and light clients for Blue, Green, Purple, and Red. A cost of $150k.
+3. Blue, Green, Purple, and Red upgrade their Tendermint consensus engines. Another $600k in cost. 
+
+In the four-zone case, the total cost could exceed $1 million. For one Hub and n zones, 2n+1 governance processes (and dump start upgrades) are necessary, and the costs scale up accordingly. Some optimization that reduces the governance burden is useful. The broader considerations go beyond the financials:
+
+* **Topology constraint**: Imagine yourself as Chain Red. When you connect to a Hub, you need to do two upgrades every time the Hub upgrades. As a result, you want to link only to one Hub. Recurse that conservatism across all chains, and a single Hub dominates. A single Hub cannot physically handle connections to hundreds, if not thousands, of zones. It caps the size of the ecosystem. In other words, the indicated upgrade pattern imposes constraints on the evolution of the Internet of Blockchains' topology.
+
+* **Rare Hub upgrades:** If the Hub connects to 50 chains and atoms have migrated to all of these; the Hub will need to coordinate with all 50 to upgrade itself. Several million dollars in costs are imposed on the ecosystem. Therefore, Hub consensus upgrades become sparse. The rate of innovation slows down dramatically as a result.
+
+* **Perverse pattern:** The ecosystem requires the most conservative chain (the Hub) to upgrade to trial any breaking feature in Tendermint. A zone connected to the Hub can't just try the new, experimental, Tendermint on its own accord. 
+
+* **The propensity of Tendermint to fork:** The natural consequence is that different teams fork off at the codebase level and promote their version of Tendermint. The "official" repo that is followed by the Hub is judged too slow.
+
+Provided this reasoning is correct; it behooves the community to make Tendermint headers as elastic as we can before IBC goes live. Once live, we can potentially put in place long terms solutions as covered in Section 4.
+
+#### 3.2 Block number continuity breaking upgrades
