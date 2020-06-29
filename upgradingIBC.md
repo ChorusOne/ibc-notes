@@ -16,7 +16,7 @@ Conceive Robinson, who transferred funds from blue chain to red chain using a pa
 
 The basic principle is that: *IBC upgrades, at all levels of the stack, require execution in a way that channels are unimpaired*. Users can expect a particular channel to be immortal since they could have transferred funds over the channel and be unavailable to make any further changes to the status quo. The end-user to design IBC for is Robinson Crusoe - they moved funds over a channel someday, and then are offline on a Pacific island for 40 years. When they return online, those funds should be around in the same state, and transferable back over the channel, provided the two chains live.
 
-#### 2.2: Users will perceive the ecosystem not a pairwise set of chains
+#### 2.2: End-users will perceive the ecosystem not a pairwise set of chains
 The second key idea is that we're collectively building an ecosystem of a hub and multiple zones connected to the Hub. The Hub's value proposition is that it removes the need for all zones to create pairwise connections with each other, thus saving on scarce computational resources for each of them. A user can conceivably have transferred funds from the purple zone to the green zone via the Hub. Their transfer is exposed to 2 channels - one between the purple zone and Hub, and another between Hub and green zone. This orchestration across two channels will probably happen without the user consciously opting into it. An ecosystem of end zones and one Hub will have complicated paths with multiple channels implicated. IBC upgrade paths should exist for all chains such that the entire ecosystem of channels remains functional. In particular, we need to be aware of upgrade patterns that break one channel between two chains, leading to a ripple effect on the entire ecosystem.
 
 #### 2.3: Sequencing upgrades for an IBC corridor
@@ -25,4 +25,18 @@ Let's consider this situation described in Figure 1. The Red chain wants to make
 #### 2.4: Upgrade constraint in Stargate
 This sub-section lists a constraint with Stargate, and potentially the Golang-IBC implementation of IBC. Updation of a light client (for the Red Chain) on the Blue chain requires the entire binary with Tendermint plus Cosmos SDK to be switched by every validator of the Blue chain. A full governance referendum followed by a dump state restart is necessitated. There is no mechanism to upgrade just the red light client without governance selectively. A typical Cosmos chain is unlike the Substrate or Ethereum ecosystems where pieces of code (smart contracts or pallets), can be upgraded independently of a hard fork of the entire base chain. Later sections detail why this may be a significant limitation and conceive how the IBC ecosystem could get such a capability relatively quickly.
 
-#### 2.5: Validator needs, upgrade economic costs and keeping Tendermint/IBC nimble
+#### 2.5: Economic costs of chain upgrades
+Each chain governance and upgrade cycle has a cost associated with it. Think of the Hub with 125 validators. Let's assume each person-hour is worth $100 to the Cosmos Hub DAO. Following individual and total costs exists for one upgrade on the Cosmos Hub: 
+
+* Each governance vote probably requires 125+ voters to spend 4 hours each. That's 500 community person-hours. The cost to Hub DAO is $50k per dump start upgrade. 
+* 4 hours effort is required by each validator for the upgrade preparation, execution, and troubleshooting those cases in which the upgrade is not smooth. In total, that involves another 500 community person-hours. The cost to Hub DAO is $50k.
+* There is some variable cost associated with the Cosmos SDK release and it's testing. Assuming that the average Hub upgrade takes two engineer months in development, that's a cost of $50k.
+* Hence, we can estimate the total costs of one governance cycle plus one dump state restart to be $150k.
+ 
+Given each chain upgrade costs $150k, a natural desire exists to reduce the total number of Hub upgrades per year. A similar incentive will exist in all zone in the Cosmos eco-system. Therefore, the IBC upgrade process should be as lean as possible to keep the COGS of these DAOs low, while preserving decentralization.
+
+#### 2.6 Keep Tendermint/IBC nimble
+A final consideration is that IBC and Tendermint consensus upgrades should remain open to radical design changes. At the consensus layer, the crypto space is exceptionally competitive - Avalanche, Solana, GRANDPA, and other consensus mechanisms go live in 2020. At the interchain communication layer, competition from ChainBridge and XCMP will heat up. While the Cosmos community has done a splendid job at skating to where the puck is (and will be), we need to keep nimble and prevent these codebases from getting stymied.
+
+### 3: Challenges outlined in the core co-ordination call
+
