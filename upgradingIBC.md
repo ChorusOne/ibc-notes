@@ -84,4 +84,11 @@ The underlying problem is a leakage of chain-ids and block numbers onto higher l
 A slightly different problem similar in flavor is chains that adopt a different mechanism for tracking "block numbers." For instance, HotStuff appears to have gone for scheduled dump-state restarts in the regular operation of its consensus algorithm. Block numbers regularly set to zero. The IBC stack, as a result, needs to be general enough to allow for a wide variety of block number and chain - id upgrade mechanisms to exists in participating chains. It's this problem that's (as yet unsolved) in the current specification and Golang implementation.
 
 ### 4. Potential Solution
-Would WASM compilable versions of the [Informal Rust IBC implementation](https://github.com/informalsystems/ibc-rs) and [Informal Rust Tendermint Light Client](https://github.com/informalsystems/tendermint-rs/tree/master/light-client) make headway in addressing these issues? (To be explored in IBC Core Co-ordination calls)
+Potential solution to address this issue is to have ibc implementation compilable to wasm, and a upgrade protocol to upgrade that wasm blob over the air.
+The ibc implementation can divide into two parts to drive more adaptability of it across different chains:
+1. Generic ibc stack: Implements chain-agnostic version of ibc constructs
+2. Chain specific implementation: Extends generic ibc with custom implementation of one or more components of ibc stake as per need
+
+Since Informal system have [Rust IBC implementation](https://github.com/informalsystems/ibc-rs) and [Tendermint Node in Rust](https://github.com/informalsystems/tendermint-rs/tree/master/light-client), we could borrow some code from those two projects and create ibc implementation, that is easily extensible
+and compiles to wasm.
+
