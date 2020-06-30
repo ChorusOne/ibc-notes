@@ -70,8 +70,6 @@ In the four-zone case, the total cost could exceed $1 million. For one Hub and n
 
 * **The propensity of Tendermint to fork:** The natural consequence is that different teams fork off at the codebase level and promote their version of Tendermint. The "official" repo that is followed by the Hub is judged too slow.
 
-Provided this reasoning is correct; it behooves the community to make Tendermint headers as elastic as we can before IBC goes live. Once live, we can potentially put in place long terms solutions as covered in Section 4.
-
 #### 3.2 Block number continuity breaking upgrades
 A different kind of problem arises when one considers the block-based packet-timeout mechanism in IBC. This mechanism essentially allows the Red chain to send a packet to the Blue Chain, with a block number based timeout. If the Blue chain does not process the particular packet by the specific block number, the sender of the packet can submit proof of noninclusion to Red and have Red handle the error gracefully. 
 
